@@ -38,7 +38,7 @@ BAUD = 9600
 # 	ser.close()
 # 	return finishTime - startTime
 start_ping_message = 'c'
-
+finish_ping_message = 'f'
 
 def ping(message):
 	ser = Serial(PORT, BAUD)
@@ -47,11 +47,20 @@ def ping(message):
 	xbee.tx(dest_addr='\x00\x01', data=message)
 
 	recievedMessage = xbee.wait_read_frame()["rf_data"]
-	while (finishMessage != "finish: line crossed"):
-		startMessage = xbee.wait_read_frame()["rf_data"]
+	finishTime = time.time()
+	while (recievedMessage != message):
+		print(recievedMessage)
+		recievedMessage = xbee.wait_read_frame()["rf_data"]
 		finishTime = time.time()
 
+	ser.close()
+	return finishTime - startTime
 
+def pingStart():
+	return ping(start_ping_message)
 
+def pingFinish():
+	return ping(finish_ping_message)
 
+print(pingFinish())
 

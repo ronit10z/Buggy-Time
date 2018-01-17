@@ -1,40 +1,72 @@
-import kivy
-kivy.require('1.0.8')
-
 from kivy.app import App
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.lang import Builder
 from kivy.uix.button import Button
-from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.scrollview import ScrollView
+from kivy.core.window import Window
+from kivy.properties import ObjectProperty
+from kivy.clock import Clock
+from collections import defaultdict
 
 
-class ScrollViewApp(App):
+class AppScreenManager(ScreenManager):
 
-    def build(self):
+    def __init__(self, **kwargs):
+        super(AppScreenManager, self).__init__(**kwargs)
 
-        # create a default grid layout with custom width/height
-        layout = GridLayout(cols=1, padding=10, spacing=10,
-                size_hint=(None, None), width=500)
 
-        # when we add children to the grid layout, its size doesn't change at
-        # all. we need to ensure that the height will be the minimum required to
-        # contain all the childs. (otherwise, we'll child outside the bounding
-        # box of the childs)
-        layout.bind(minimum_height=layout.setter('height'))
+class Menu(Screen):
+    trials = 5
+    view = ObjectProperty()
+    scrollview = None
+    timeDict = defaultdict(lambda: [0]*trials)
+    headerString = ["Name"] + ["trial {}".format(i) for i in range(1, trials + 1)]
 
-        # add button into that grid
-        for i in range(30):
-            btn = Button(text=str(i), size=(50, 40),
-                         size_hint=(None, None))
-            layout.add_widget(btn)
 
-        # create a scroll view, with a size < size of the grid
-        root = ScrollView(size_hint=(None, None), size=(100, 320),
+    def __init__(self, **kwargs):
+        super(Menu, self).__init__(**kwargs)
+        Clock.schedule_interval(self.create_scrollview, 1)
+
+    def submit_student(self):
+ 
+        # Get the student name from the TextInputs
+        student_name = self.name_text_input.text
+        print(student_name)
+        self.trials+=1
+        self.view._trigger_reset_populate()
+
+    def create_scrollview(self, dt):
+        # self.view.clear_Widgets()
+        if (self.scrollview != None):
+            self.scrollview.clear_Widgets()
+
+        base = ["{}".format(i) for i in range(40)]
+        layout = GridLayout(cols=self.trials + 1, spacing=0, size_hint_y=None)
+        layout.bind(minimum_height=layout.setter("height"))
+
+        for element in self.headerString:
+            layout.add_widget(Button(text=element, size=(50, 50), size_hint=(1, None),
+                                     background_color=(0.5, 0.5, 0.5, 1), color=(1, 1, 1, 1)))
+
+        for element in base:
+            layout.add_widget(Button(text=element, size=(50, 50), size_hint=(1, None),
+                                     background_color=(0.5, 0.5, 0.5, 1), color=(1, 1, 1, 1)))
+        self.scrollview = ScrollView(size_hint=(None, None), size=(Window.width/2, Window.height),
                 pos_hint={'center_x': .5, 'center_y': .5}
                 , do_scroll_x=False)
-        root.add_widget(layout)
+        self.scrollview.add_widget(layout)
+        self.view.add_widget(self.scrollview)
 
-        return root
+
+Builder.load_file("debug.kv")
+
+
+class MyAppli(App):
+
+    def build(self):
+        return AppScreenManager()
+
 
 if __name__ == '__main__':
-
-    ScrollViewApp().run()
+    MyAppli().run()

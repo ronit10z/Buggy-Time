@@ -5,7 +5,7 @@ import tkinter.constants, tkinter.filedialog
 import csv
 from collections import defaultdict
 
-import coordinator
+import coordinator as coord
 
 
 def openFile():
@@ -232,6 +232,11 @@ if __name__ == '__main__':
             self.t = time.time()
             # Do something every second if allowed
             if (canPing):
+                if (!coord.pingStart() || !coord.pingFinish()):
+                    goButton.configure(bg = "red")
+                else:
+                    goButton.configure(bg = "green")
+
                 print (time.time())
             self.master.after(1000, self.ping)
 

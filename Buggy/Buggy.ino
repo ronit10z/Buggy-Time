@@ -7,7 +7,7 @@
 /**********************************************************************
  *                CONSTANT/MACRO/GLOBAL DEFINITIONS
  **********************************************************************/
- 
+
 // Digital pin definition for pressure sensor (debug purposes only)
 #define SENSOR_DIGITAL 8
 // Analog pin definition for pressure sensor
@@ -22,12 +22,12 @@ int baseline;
 char buffer[11];
 
 // Wait for ready message before reading pressure sensor values
-const char ready_message[] = "start: ready";
+char ready_message[] = "start: ready";
 // Message to be transmitted back to coordinator when pressure sensor is depressed
-const char line_crossed_message[] = "start: line crossed";
+char line_crossed_message[] = "start: line crossed";
 
-const char finish_ready_message[] = "finish: ready";
-const char finish_line_crossed_message[] = "finish: line crossed";
+char finish_ready_message[] = "finish: ready";
+char finish_line_crossed_message[] = "finish: line crossed";
 
 // XBee's DOUT (TX) is connected to pin 2 (Arduino's Software RX)
 // XBee's DIN (RX) is connected to pin 3 (Arduino's Software TX)
@@ -39,7 +39,7 @@ byte index = 0; // Index into array; where to store the character
 /**********************************************************************
  *                             SETUP
  **********************************************************************/
- 
+
 void setup()
 {
   // Set up XBee to run at 9600 baud
@@ -55,18 +55,18 @@ void setup()
 /**********************************************************************
  *                             MAIN LOOP
  **********************************************************************/
- 
+
 void loop()
 {
   if(DEBUG){
 //    // Print voltage to serial monitor
 //    int voltage = analogRead(SENSOR);
 //    Serial.println(voltage);
-//    
+//
 //    //Transmit voltage to coordinator
 //    sprintf(buffer, "%d\n", voltage);
 //    XBee.write(buffer);
-//    
+//
 //    if (Serial.available()){ // If data comes in from serial monitor, send it out to XBee
 //      XBee.write(Serial.read());
 //    }
@@ -79,7 +79,7 @@ void loop()
     delay(1000);
     transmit_line_crossed();
 
-    wait_for_finish_ready();
+    // wait_for_finish_ready();
     delay(10000);
     transmit_finish_line_crossed();
   }
@@ -95,7 +95,7 @@ void loop()
 /**********************************************************************
  *                           HELPER FUNCTIONS
  **********************************************************************/
- 
+
 // Hang until ready signal is received from coordinator
 void wait_for_ready()
 {
@@ -133,7 +133,7 @@ void transmit_finish_line_crossed()
   XBee.write(finish_line_crossed_message);
 }
 
-char Comp(char* This) 
+char Comp(char* This)
 {
     while (XBee.available() > 0) // Don't read unless
                                    // there you know there is data

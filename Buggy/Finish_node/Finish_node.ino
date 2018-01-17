@@ -112,6 +112,8 @@ void wait_for_data()
                 return;
             case ping_finish_message:
                 XBee.write(message);
+                Serial.print("Sending: ");
+                Serial.println(message);
                 break;
             case ready_message:
             case ping_start_message:

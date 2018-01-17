@@ -107,11 +107,15 @@ void wait_for_data()
   while(true){
     while (XBee.available()){
         char message = XBee.read();
+        Serial.print("Recieved: ");
+        Serial.println(message);
         switch (message){
             case ready_message:
                 return;
             case ping_start_message:
                 XBee.write(message);
+                Serial.print("Sending: ");
+                Serial.println(message);
                 break;
             case finish_ready_message:
             case ping_finish_message:

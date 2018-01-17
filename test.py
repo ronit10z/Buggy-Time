@@ -91,7 +91,7 @@ if __name__ == '__main__':
     #         entry = tk.Entry(frame_buttons, text="", width=8)
     #         if (j == 0 and i < len(names)):
     #             entry.configure(width=15)
-    #             entry.delete(0,tk.END)      
+    #             entry.delete(0,tk.END)
     #             entry.insert(0, names[i])
     #         entry.grid(row=i, column=j, sticky='news')
 
@@ -117,14 +117,14 @@ if __name__ == '__main__':
               entry.insert(0, currentName)
           elif (currentTimes != None and j < len(currentTimes) + 1):
               entry.configure(width=8)
-              entry.delete(0,tk.END)      
+              entry.delete(0,tk.END)
               entry.insert(0, currentTimes[j - 1])
           entry.grid(row=i, column=j, sticky='news')
 
 
 #                            FILE MANAGEMENT
 #******************************************************************************
-    
+
     fileLF = ttk.LabelFrame(root, text=" CSV File ")
     fileLF.grid(row=2, columnspan=4, sticky='W', \
                    padx=5, pady=5, ipadx=5, ipady=5)
@@ -161,6 +161,9 @@ if __name__ == '__main__':
 
     def test():
       updateCell("Kevin", 12.4)
+
+    def go():
+        trialTime = getTrialTime
 
     def popup_bonus():
       win = tk.Toplevel()
@@ -208,11 +211,11 @@ if __name__ == '__main__':
     goButton = tk.Button(root, text="GO", font=("Helvetica", 16), bg = "lawn green", command = popup_bonus)
     goButton.grid(row=6, columnspan=4, sticky='NSEW', \
                  padx=5, pady=5, ipadx=5, ipady=5)
-    
+
     timerLF = tk.LabelFrame(root, text=" Time: ")
     timerLF.grid(row=5, column=1, columnspan=2, sticky='EW', \
                  padx=5, pady=5, ipadx=5, ipady=5)
-    
+
     timer = tk.Label(timerLF, text= "00:00",font=("Helvetica", 16))
     timer.grid(sticky='EW', padx=5, pady=2)
 

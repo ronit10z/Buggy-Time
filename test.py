@@ -5,6 +5,8 @@ import Tkconstants, tkFileDialog
 import csv
 from collections import defaultdict
 
+import coordinator
+
 
 def openFile():
 
@@ -119,26 +121,6 @@ if __name__ == '__main__':
               entry.insert(0, currentTimes[j - 1])
           entry.grid(row=i, column=j, sticky='news')
 
-    
-
-
-#                              TIMER CONTROL
-#******************************************************************************
-    def color_change():
-        goButton.configure(bg = "gray85")
-
-    goButton = tk.Button(root, text="GO", font=("Helvetica", 16), bg = "lawn green", command = color_change)
-    goButton.grid(row=6, columnspan=4, sticky='NSEW', \
-                 padx=5, pady=5, ipadx=5, ipady=5)
-    
-    timerLF = tk.LabelFrame(root, text=" Time: ")
-    timerLF.grid(row=5, column=1, columnspan=2, sticky='EW', \
-                 padx=5, pady=5, ipadx=5, ipady=5)
-    
-    timer = tk.Label(timerLF, text= "00:00",font=("Helvetica", 16))
-    timer.grid(sticky='EW', padx=5, pady=2)
-
-
 
 #                            FILE MANAGEMENT
 #******************************************************************************
@@ -183,7 +165,7 @@ if __name__ == '__main__':
     def popup_bonus():
       win = tk.Toplevel()
       win.wm_title("Window")
-      win.geometry('200x350')
+      win.geometry('150x250')
 
       tableLf = tk.LabelFrame(win, text="Select a pusher")
       tableLf.grid(row=0, column=0, columnspan=2, rowspan=8, \
@@ -208,12 +190,31 @@ if __name__ == '__main__':
       mylist.pack(side = tk.LEFT, fill = tk.BOTH)
       vsbar.config(command = mylist.yview)
 
+      def grab_name():
+        nameidx = mylist.curselection()[0]
+        name = mylist.get(nameidx)
+        win.destroy()
+        print (name)
 
-      b = ttk.Button(win, text="Okay", command=win.destroy)
+      b = ttk.Button(win, text="Okay", command=grab_name)
       b.grid(row=12, column=1)
 
 
+#                              TIMER CONTROL
+#******************************************************************************
+    def color_change():
+        goButton.configure(bg = "gray85")
 
+    goButton = tk.Button(root, text="GO", font=("Helvetica", 16), bg = "lawn green", command = popup_bonus)
+    goButton.grid(row=6, columnspan=4, sticky='NSEW', \
+                 padx=5, pady=5, ipadx=5, ipady=5)
+    
+    timerLF = tk.LabelFrame(root, text=" Time: ")
+    timerLF.grid(row=5, column=1, columnspan=2, sticky='EW', \
+                 padx=5, pady=5, ipadx=5, ipady=5)
+    
+    timer = tk.Label(timerLF, text= "00:00",font=("Helvetica", 16))
+    timer.grid(sticky='EW', padx=5, pady=2)
 
     export = ttk.Button(fileLF, text=" Export ", command=popup_bonus)
     export.grid(row=2, column=0, columnspan=2, sticky='EW', padx=5, pady=2)

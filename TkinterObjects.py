@@ -1,8 +1,4 @@
-from ThreeDObjects import *
 from tkinter import messagebox,simpledialog
-import wolframalpha
-import urllib
-import json
 
 class SimpleButton(object):
     def __init__(self,name,cx,cy,r):

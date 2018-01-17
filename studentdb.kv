@@ -1,0 +1,99 @@
+# ---------- studentdb.kv  ----------
+ 
+# Reference studentdb.py
+#: import main studentdb
+#: import ListAdapter kivy.adapters.listadapter.ListAdapter
+#: import ListItemButton kivy.uix.listview.ListItemButton
+ 
+StudentDB:
+<StudentDB>:
+    orientation: "vertical"
+    name_text_input: name
+    student_list: students_list_view
+    padding: 10
+    spacing: 10
+ 
+    BoxLayout:
+        size_hint_y: None
+        height: "40dp"
+ 
+        Label:
+            text: "Name"
+        TextInput:
+            id: name
+ 
+    BoxLayout:
+        size_hint_y: None
+        height: "40dp"
+        Button:
+            text: "Submit"
+            size_hint_x: 15
+            on_release: root.submit_student()
+        Button:
+            text: "Delete"
+            size_hint_x: 15
+            on_release: root.delete_student()
+        Button:
+            text: "Replace"
+            size_hint_x: 15
+            on_release: root.replace_student()
+        Button:
+            text: "Load Names"
+            size_hint_x: 15
+            on_release: root.show_load()
+
+ 
+    # Define starting data and point to the ListItemButton
+    # in the Python code
+    ListView:
+        id: students_list_view
+        adapter:
+            ListAdapter(data=["Harambe"],
+            args_converter=lambda row_index, an_obj: {'text': an_obj,'size': (100, 80)},
+            cls=main.StudentListButton)
+
+<LoadDialog>:
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserListView:
+            id: filechooser
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Load"
+                on_release: root.load(filechooser.path, filechooser.selection)
+
+<SaveDialog>:
+    text_input: text_input
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserListView:
+            id: filechooser
+            on_selection: text_input.text = self.selection and self.selection[0] or ''
+
+        TextInput:
+            id: text_input
+            size_hint_y: None
+            height: 30
+            multiline: False
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Save"
+                on_release: root.save(filechooser.path, text_input.text)

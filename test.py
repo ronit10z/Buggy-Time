@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import time
-import Tkconstants, tkFileDialog
+import tkinter.constants, tkinter.filedialog
 import csv
 from collections import defaultdict
 
@@ -163,9 +163,10 @@ if __name__ == '__main__':
       updateCell("Kevin", 12.4)
 
     def go():
-        trialTime = getTrialTime
+        trialTime = 0
+        popup_bonus(trialTime)
 
-    def popup_bonus():
+    def popup_bonus(trialTime):
       win = tk.Toplevel()
       win.wm_title("Window")
       win.geometry('150x250')
@@ -196,8 +197,8 @@ if __name__ == '__main__':
       def grab_name():
         nameidx = mylist.curselection()[0]
         name = mylist.get(nameidx)
+        updateCell(name, trialTime)
         win.destroy()
-        print (name)
 
       b = ttk.Button(win, text="Okay", command=grab_name)
       b.grid(row=12, column=1)
@@ -208,7 +209,7 @@ if __name__ == '__main__':
     def color_change():
         goButton.configure(bg = "gray85")
 
-    goButton = tk.Button(root, text="GO", font=("Helvetica", 16), bg = "lawn green", command = popup_bonus)
+    goButton = tk.Button(root, text="GO", font=("Helvetica", 16), bg = "lawn green", command = go)
     goButton.grid(row=6, columnspan=4, sticky='NSEW', \
                  padx=5, pady=5, ipadx=5, ipady=5)
 

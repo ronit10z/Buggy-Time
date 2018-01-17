@@ -107,6 +107,8 @@ void wait_for_data()
   while(true){
     while (XBee.available()){
         char message = XBee.read();
+        Serial.print("Recieved: ");
+        Serial.println(message);
         switch (message){
             case finish_ready_message:
                 return;

@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 import Tkconstants, tkFileDialog
 import csv
 from collections import defaultdict
@@ -60,11 +61,11 @@ if __name__ == '__main__':
 		Can1 = tk.Canvas(tableFrame)
 		Can1.grid(row=0, column=0)
 
-		vsbar = tk.Scrollbar(tableFrame, orient="vertical", command=Can1.yview)
+		vsbar = ttk.Scrollbar(tableFrame, orient="vertical", command=Can1.yview)
 		vsbar.grid(row=0, column=1, sticky='ns')
 		Can1.configure(yscrollcommand=vsbar.set)
 
-		hsbar = tk.Scrollbar(tableFrame, orient="horizontal", command=Can1.xview)
+		hsbar = ttk.Scrollbar(tableFrame, orient="horizontal", command=Can1.xview)
 		hsbar.grid(row=1, column=0, sticky='ew')
 		Can1.configure(xscrollcommand=hsbar.set)
 
@@ -93,27 +94,24 @@ if __name__ == '__main__':
 		nameTimesDict["Kevin"].append(13.2)
 		nameTimesDict["James"].append(14.1)
 		dictKeys = sorted(nameTimesDict.keys())
-		print(dictKeys)
 		entryGrid = [[0]*columns for row in range(rows)]
-		print(entryGrid)
 
 		for i in range(0,rows):
 			if (i < len(dictKeys)):
 				currentName = dictKeys[i]
 				currentTimes = nameTimesDict[currentName]
-				print(currentTimes)
 			else:
 				currentName = None
 				currentTimes = None
 
 			for j in range(0,columns):
-					entry = tk.Entry(frame_buttons, text="", width=8)
+					entry = ttk.Entry(frame_buttons, text="", width=8)
+					entryGrid[i][j] = entry
 					if (j == 0 and currentName != None):
 							entry.configure(width=15)
 							entry.delete(0,tk.END)
 							entry.insert(0, currentName)
 					elif (currentTimes != None and j < len(currentTimes) + 1):
-							print(currentTimes)
 							entry.configure(width=8)
 							entry.delete(0,tk.END)      
 							entry.insert(0, currentTimes[j - 1])
@@ -143,18 +141,18 @@ if __name__ == '__main__':
 #                            FILE MANAGEMENT
 #******************************************************************************
 		
-		fileLF = tk.LabelFrame(root, text=" CSV File ")
+		fileLF = ttk.LabelFrame(root, text=" CSV File ")
 		fileLF.grid(row=2, columnspan=4, sticky='W', \
 									 padx=5, pady=5, ipadx=5, ipady=5)
 
-		fileTextBox = tk.Entry(fileLF)
+		fileTextBox = ttk.Entry(fileLF)
 		fileTextBox.grid(row=0, column=0, sticky='WE', padx=5, pady=5)
 
 		def browseFile():
 			fileName = openFile()
 			fileTextBox.insert(0, fileName)
 
-		browse = tk.Button(fileLF, text=" Browse... ", command=browseFile)
+		browse = ttk.Button(fileLF, text=" Browse... ", command=browseFile)
 		browse.grid(row=0, column=3, columnspan=2, sticky='W', padx=5, pady=2)
 
 
@@ -165,16 +163,57 @@ if __name__ == '__main__':
 						readCSV = csv.reader(csvfile, delimiter=',')
 
 
-		inport = tk.Button(fileLF, text=" Import ", command= inportFile)
+		inport = ttk.Button(fileLF, text=" Import ", command= inportFile)
 		inport.grid(row=1, column=0, columnspan=2, sticky='EW', padx=5, pady=2)
 
 		def updateCell(name, value):
 			nameTimesDict[name].append(value)
 
-			row = nameTimesDict.index(name)
-			col = len(nameTimesDict[name]) + 1
+			row = dictKeys.index(name)
+			col = len(nameTimesDict[name])
 
-		export = tk.Button(fileLF, text=" Export ")
+			entry = entryGrid[row][col]
+			entry.insert(0, value)
+
+		def test():
+			updateCell("Kevin", 12.4)
+
+		def popup_bonus():
+			win = tk.Toplevel()
+			win.wm_title("Window")
+			win.geometry('200x350')
+
+			tableLf = tk.LabelFrame(win, text="Select a pusher")
+			tableLf.grid(row=0, column=0, columnspan=2, rowspan=8, \
+									sticky='NS', padx=5, pady=5)
+			tableCanvas = tk.Canvas(tableLf)
+			tableCanvas.grid(row=0)
+
+			tableFrame = tk.Frame(tableCanvas)
+			tableFrame.grid(row=0, column=0, sticky='nw')
+
+			Can1 = tk.Canvas(tableFrame)
+			Can1.grid(row=0, column=0)
+
+			vsbar = ttk.Scrollbar(tableFrame, orient="vertical", command=Can1.yview)
+			vsbar.grid(row=0, column=1, sticky='ns')
+			Can1.configure(yscrollcommand=vsbar.set)
+
+			mylist = tk.Listbox(Can1, yscrollcommand = vsbar.set)
+			for i in range(len(dictKeys)):
+				 mylist.insert(tk.END, dictKeys[i])
+
+			mylist.pack(side = tk.LEFT, fill = tk.BOTH)
+			vsbar.config(command = mylist.yview)
+
+
+			b = ttk.Button(win, text="Okay", command=win.destroy)
+			b.grid(row=12, column=1)
+
+
+
+
+		export = ttk.Button(fileLF, text=" Export ", command=popup_bonus)
 		export.grid(row=2, column=0, columnspan=2, sticky='EW', padx=5, pady=2)
 
 		root.mainloop()

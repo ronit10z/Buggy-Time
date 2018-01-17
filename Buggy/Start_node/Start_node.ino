@@ -112,6 +112,7 @@ void wait_for_data()
                 return;
             case ping_start_message:
                 XBee.write(message);
+                break;
             case finish_ready_message:
             case ping_finish_message:
             default:

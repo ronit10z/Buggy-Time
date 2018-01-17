@@ -22,12 +22,16 @@ int baseline;
 char buffer[11];
 
 // Wait for ready message before reading pressure sensor values
-char ready_message[] = "start: ready";
+const char ready_message = 'a';
 // Message to be transmitted back to coordinator when pressure sensor is depressed
-char line_crossed_message[] = "start: line crossed";
+const char line_crossed_message = 'b';
+const char ping_start_message = 'c';
 
-char finish_ready_message[] = "finish: ready";
-char finish_line_crossed_message[] = "finish: line crossed";
+const char finish_ready_message = 'd';
+const char finish_line_crossed_message = 'e';
+const char ping_finish_message = 'f';
+
+
 
 // XBee's DOUT (TX) is connected to pin 2 (Arduino's Software RX)
 // XBee's DIN (RX) is connected to pin 3 (Arduino's Software TX)
@@ -75,17 +79,17 @@ void loop()
 //    }
 //
 //    delay(100);
-    wait_for_ready();
+    wait_for_data();
     delay(1000);
     transmit_line_crossed();
 
     // wait_for_finish_ready();
-    delay(10000);
+    delay(1000);
     transmit_finish_line_crossed();
   }
 
   else{
-    wait_for_ready();
+    wait_for_data();
     wait_for_press();
     transmit_line_crossed();
   }
@@ -97,10 +101,23 @@ void loop()
  **********************************************************************/
 
 // Hang until ready signal is received from coordinator
-void wait_for_ready()
+void wait_for_data()
 {
+  Serial.println("waiting for ready");
   while(true){
-    if (Comp(ready_message) == 0) break;
+    while (XBee.available()){
+        char message = XBee.read();
+        switch (message){
+            case ready_message:
+                return;
+            case ping_start_message:
+                XBee.write(message);
+            case finish_ready_message:
+            case ping_finish_message:
+            default:
+                continue;
+        }
+    }
   }
 }
 
@@ -118,43 +135,13 @@ void wait_for_press()
 // Transmit line crossed message back to coordinator
 void transmit_line_crossed()
 {
+  Serial.println(line_crossed_message);
   XBee.write(line_crossed_message);
 }
 
-void wait_for_finish_ready()
-{
-  while(true){
-    if (Comp(finish_ready_message) == 0) break;
-  }
-}
 
 void transmit_finish_line_crossed()
 {
+  Serial.println(finish_line_crossed_message);
   XBee.write(finish_line_crossed_message);
-}
-
-char Comp(char* This)
-{
-    while (XBee.available() > 0) // Don't read unless
-                                   // there you know there is data
-    {
-        if(index < 19) // One less than the size of the array
-        {
-            inChar = XBee.read(); // Read a character
-            inData[index] = inChar; // Store it
-            index++; // Increment where to write next
-            inData[index] = '\0'; // Null terminate the string
-        }
-    }
-
-    if (strcmp(inData,This)  == 0) {
-        for (int i=0;i<19;i++) {
-            inData[i]=0;
-        }
-        index=0;
-        return(0);
-    }
-    else {
-        return(1);
-    }
 }

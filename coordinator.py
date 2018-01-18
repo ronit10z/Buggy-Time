@@ -41,34 +41,29 @@ start_ping_message = 'c'
 finish_ping_message = 'f'
 
 def ping(message):
-	timeOut = 0.2
-	ser = Serial(PORT, BAUD)
-	xbee = XBee(ser)
-	startTime = time.time()
-	xbee.tx(dest_addr='\x00\x01', data=message)
+    timeOut = 0.2
+    ser = Serial(PORT, BAUD, timeout=1)
+    xbee = XBee(ser)
+    startTime = time.time()
+    xbee.tx(dest_addr='\x00\x01', data=message)
+    while not ser.inWaiting():
+        finishTime = time.time()
+        if (finishTime-startTime > timeOut):
+            return False
+    recievedMessage = xbee.wait_read_frame()["rf_data"].decode('utf8')
+    if (recievedMessage != message):
+        return False
 
-	recievedMessage = xbee.wait_read_frame()["rf_data"]
-	finishTime = time.time()
-
-	if (time.time() - startTime > timeOut):
-			return False
-
-	while (recievedMessage != message):
-		print(time.time() - startTime)
-		if (time.time() - startTime > timeOut):
-			return False
-		recievedMessage = xbee.wait_read_frame()["rf_data"]
-
-	ser.close()
-	return True
+    ser.close()
+    return True
 
 def pingStart():
-	return ping(start_ping_message)
+    return ping(start_ping_message)
 
 def pingFinish():
-	return ping(finish_ping_message)
+    return ping(finish_ping_message)
 
 def pingBoth():
-	return pingStart() and pingFinish()
+    return pingStart() and pingFinish()
 
 print(pingBoth())

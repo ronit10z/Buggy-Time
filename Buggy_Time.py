@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import time
 import tkinter.filedialog as tkFileDialog
-import tkMessageBox
+import tkinter.messagebox as tkMessageBox
 import csv
 from collections import defaultdict
 import datetime
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     connectivityMenu = tk.Menu(menubar, tearoff=0)
     connectivityMenu.add_command(label="Check Start Connectivity", command=checkStartConnectivity)
     connectivityMenu.add_command(label="Check End Connectivity", command=checkEndConnectivity)
-    
+
     menubar.add_cascade(label="Connectivity", menu=connectivityMenu)
 
     helpmenu = tk.Menu(menubar, tearoff=0)

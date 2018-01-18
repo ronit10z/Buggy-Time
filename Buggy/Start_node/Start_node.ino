@@ -1,7 +1,7 @@
 //SoftwareSerial library used to communicate with the XBee:
 #include <SoftwareSerial.h>
 
-#define DEBUG true
+#define DEBUG false
 
 
 /**********************************************************************
@@ -15,6 +15,10 @@
 
 // Wait for difference between baseline and actual pressure reading to be greater than threshold before transmitting
 #define THRESHOLD 100
+// LED Pin that shows the pad has been PRESSEDLED
+#define PRESSEDLED 12
+// LED Pin that shows pad is ready to recieve a press
+#define READYLED 11
 // Baseline voltage reading from pressure sensors on startup
 int baseline;
 
@@ -49,10 +53,13 @@ void setup()
   // Set up XBee to run at 9600 baud
   XBee.begin(9600);
   Serial.begin(9600);
+  pinMode(READYLED, OUTPUT);
+  pinMode(PRESSEDLED, OUTPUT);
 
   // Initialize pressure sensors
   pinMode(SENSOR_DIGITAL, INPUT);
-  baseline = analogRead(SENSOR);
+
+  baseline = collect_baseline();
 }
 
 
@@ -86,8 +93,13 @@ void loop()
 
   else{
     wait_for_data();
+    digitalWrite(READYLED, HIGH);
     wait_for_press();
+    digitalWrite(READYLED, LOW);
     transmit_line_crossed();
+    digitalWrite(PRESSEDLED, HIGH);
+    delay(500);
+    digitalWrite(PRESSEDLED, LOW);
   }
 }
 
@@ -107,6 +119,7 @@ void wait_for_data()
         Serial.println(message);
         switch (message){
             case ready_message:
+                baseline = collect_baseline();
                 return;
             case ping_start_message:
                 XBee.write(message);
@@ -126,10 +139,13 @@ void wait_for_data()
 void wait_for_press()
 {
   while(true){
-    Serial.println("loop");
+    // Serial.println("loop");
     int voltage = analogRead(SENSOR);
     int difference = baseline - voltage;
-    if (difference >= THRESHOLD) break;
+    if (difference >= THRESHOLD)
+    {
+        break;
+    }
   }
 }
 
@@ -145,4 +161,15 @@ void transmit_finish_line_crossed()
 {
   Serial.println(finish_line_crossed_message);
   XBee.write(finish_line_crossed_message);
+}
+
+int collect_baseline()
+{
+    int baseline = 0;
+    for (int i = 0; i < 10; i ++)
+    {
+        baseline += analogRead(SENSOR);
+    }
+    baseline /= 10;
+    return baseline;
 }

@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import time
 import tkinter.filedialog as tkFileDialog
+import tkMessageBox
 import csv
 from collections import defaultdict
 import datetime
@@ -18,7 +19,7 @@ def openFile():
 if __name__ == '__main__':
     root = tk.Tk()
     getFld = tk.IntVar()
-    root.wm_title("Poop")
+    root.wm_title("Buggy Time")
     root.iconbitmap("poop.ico")
 
     canPing = True
@@ -28,8 +29,24 @@ if __name__ == '__main__':
 #                                   MENU
 #******************************************************************************
     def hello():
-        print ("hello!")
+      print ("hello!")
+
+    def checkStartConnectivity():
+      if (coord.pingStart()):
+        message = "Connected"
+      else:
+        message = "Not Connected"
+      tkMessageBox.showinfo("Start Connection", message)
+
+    def checkEndConnectivity():
+      if (coord.pingFinish()):
+        message = "Connected"
+      else:
+        message = "Not Connected"
+      tkMessageBox.showinfo("Finish Connection", message)
+
     menubar = tk.Menu(root)
+
 
     # create a pulldown menu, and add it to the menu bar
     filemenu = tk.Menu(menubar, tearoff=0)
@@ -40,11 +57,11 @@ if __name__ == '__main__':
     menubar.add_cascade(label="File", menu=filemenu)
 
     # create more pulldown menus
-    editmenu = tk.Menu(menubar, tearoff=0)
-    editmenu.add_command(label="Cut", command=hello)
-    editmenu.add_command(label="Copy", command=hello)
-    editmenu.add_command(label="Paste", command=hello)
-    menubar.add_cascade(label="Edit", menu=editmenu)
+    connectivityMenu = tk.Menu(menubar, tearoff=0)
+    connectivityMenu.add_command(label="Check Start Connectivity", command=checkStartConnectivity)
+    connectivityMenu.add_command(label="Check End Connectivity", command=checkEndConnectivity)
+    
+    menubar.add_cascade(label="Connectivity", menu=connectivityMenu)
 
     helpmenu = tk.Menu(menubar, tearoff=0)
     helpmenu.add_command(label="About", command=hello)
@@ -276,12 +293,21 @@ if __name__ == '__main__':
             self.t = time.time()
             # Do something every second if allowed
             if (canPing):
-                if (not coord.pingBoth()):
+                pingStart = coord.pingStart()
+                pingFinish = coord.pingFinish()
+
+                if (not (pingStart or pingFinish)):
                     systemAvailable = False
-                    goButton.configure(bg = "red")
+                    goButton.configure(bg = "red", text = "Both Disconnected")
+                elif (not (pingStart)):
+                  systemAvailable = False
+                  goButton.configure(bg = "red", text = "Start Disconnected")
+                elif (not (pingFinish)):
+                  systemAvailable = False
+                  goButton.configure(bg = "red", text = "Finish Disconnected")
                 else:
                     systemAvailable = True
-                    goButton.configure(bg = "lawn green")
+                    goButton.configure(bg = "lawn green", text = "GO")
 
             self.master.after(1000, self.ping)
 

@@ -71,6 +71,8 @@ def pingBoth():
     return pingStart() and pingFinish()
 
 def getTrial():
+    timeOut = 60
+    counterLimit = 50
     ser = Serial(PORT, BAUD, timeout=1)
     xbee = XBee(ser)
 
@@ -79,18 +81,47 @@ def getTrial():
     xbee.tx(dest_addr='\x00\x01', data=finish_ready_message)
 
     # Wait for start line crossed
+    beginTime = time.time()
+    while not ser.inWaiting(): #check for no response and end if no response
+        endTime = time.time()
+        if (endTime-beginTime > timeOut):
+            return None
     startMessage = xbee.wait_read_frame()["rf_data"].decode('utf8')
     startTime = time.time()
+    counter = 0
     while(startMessage != start_line_crossed_message):
+        if (counter > counterLimit): #Try for the correct message counterLimit times
+            return None
+        beginTime = time.time()
+        while not ser.inWaiting(): #check for no response and end if no response
+            endTime = time.time()
+            if (endTime-beginTime > timeOut):
+                return None
         startMessage = xbee.wait_read_frame()["rf_data"].decode('utf8')
         startTime = time.time()
+        counter += 1
 
     # Wait for finish line crossed
+    beginTime = time.time()
+    while not ser.inWaiting(): #check for no response and end if no response
+        endTime = time.time()
+        if (endTime-beginTime > timeOut):
+            return None
     finishMessage = xbee.wait_read_frame()["rf_data"].decode('utf8')
     finishTime = time.time()
+
+    counter = 0
     while(finishMessage != finish_line_crossed_message):
+        if (counter > counterLimit): #Try for the correct message counterLimit times
+            return None
+        beginTime = time.time()
+        while not ser.inWaiting(): #check for no response and end if no response
+            endTime = time.time()
+            if (endTime-beginTime > timeOut):
+                return None
         finishMessage = xbee.wait_read_frame()["rf_data"].decode('utf8')
         finishTime = time.time()
+        counter += 1
 
     trialTime = finishTime - startTime
 

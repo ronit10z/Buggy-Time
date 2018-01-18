@@ -21,6 +21,7 @@ if __name__ == '__main__':
     root.iconbitmap("poop.ico")
 
     canPing = True
+    systemAvailable = False
     nameTimesDict = defaultdict(list)
 
 #                                   MENU
@@ -155,14 +156,21 @@ if __name__ == '__main__':
 
     def go():
         global canPing
-        canPing = False
-        trialTime = coord.getTrial()
-        popup_bonus(trialTime)
+        global systemAvailable
+        if (systemAvailable):
+            canPing = False
+            trialTime = coord.getTrial()
+            if (trialTime == None):
+                return
+            popup_bonus(trialTime)
+        else:
+            pass
 
     def popup_bonus(trialTime):
       win = tk.Toplevel()
       win.wm_title("Window")
       win.geometry('150x250')
+      win.grab_set()
 
       tableLf = tk.LabelFrame(win, text="Select a pusher")
       tableLf.grid(row=0, column=0, columnspan=2, rowspan=8, \
@@ -204,7 +212,7 @@ if __name__ == '__main__':
     def color_change():
         goButton.configure(bg = "gray85")
 
-    goButton = tk.Button(root, text="GO", font=("Helvetica", 16), bg = "lawn green", command = go)
+    goButton = tk.Button(root, text="GO", font=("Helvetica", 16), bg = "red", command = go)
     goButton.grid(row=6, columnspan=4, sticky='NSEW', \
                  padx=5, pady=5, ipadx=5, ipady=5)
 
@@ -225,13 +233,16 @@ if __name__ == '__main__':
 
         def ping(self):
             global canPing
+            global systemAvailable
             self.t = time.time()
             # Do something every second if allowed
             if (canPing):
                 if (not coord.pingBoth()):
+                    systemAvailable = False
                     goButton.configure(bg = "red")
                 else:
-                    goButton.configure(bg = "green")
+                    systemAvailable = True
+                    goButton.configure(bg = "lawn green")
 
             self.master.after(1000, self.ping)
 

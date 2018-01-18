@@ -82,10 +82,6 @@ void loop()
     wait_for_data();
     delay(1000);
     transmit_line_crossed();
-
-    // wait_for_finish_ready();
-    delay(1000);
-    transmit_finish_line_crossed();
   }
 
   else{

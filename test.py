@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import time
-import tkinter.constants, tkinter.filedialog
+import tkinter.filedialog as tkFileDialog
 import csv
 from collections import defaultdict
 
@@ -85,15 +85,6 @@ if __name__ == '__main__':
     # Add the buttons to the frame
     rows = 50
     columns = 10
-    # names = ["Alice","Bob","Charlie","David","Eve","Frank","Grace","Heidi","Isabella","Judy","Kevin","Lucy","Mallory","Nicole","Oscar","Pat","Richard","Sybil","Trent","Victor","Wendy"]
-    # for i in range(0,rows):
-    #     for j in range(0,columns):
-    #         entry = tk.Entry(frame_buttons, text="", width=8)
-    #         if (j == 0 and i < len(names)):
-    #             entry.configure(width=15)
-    #             entry.delete(0,tk.END)
-    #             entry.insert(0, names[i])
-    #         entry.grid(row=i, column=j, sticky='news')
 
     nameTimesDict["Kevin"].append(13.2)
     nameTimesDict["James"].append(14.1)
@@ -163,7 +154,9 @@ if __name__ == '__main__':
       updateCell("Kevin", 12.4)
 
     def go():
-        trialTime = 0
+        global canPing
+        canPing = False
+        trialTime = coord.getTrial()
         popup_bonus(trialTime)
 
     def popup_bonus(trialTime):
@@ -195,9 +188,11 @@ if __name__ == '__main__':
       vsbar.config(command = mylist.yview)
 
       def grab_name():
+        global canPing
         nameidx = mylist.curselection()[0]
         name = mylist.get(nameidx)
         updateCell(name, trialTime)
+        canPing = True
         win.destroy()
 
       b = ttk.Button(win, text="Okay", command=grab_name)
@@ -229,15 +224,15 @@ if __name__ == '__main__':
             self.ping() # start polling
 
         def ping(self):
+            global canPing
             self.t = time.time()
             # Do something every second if allowed
             if (canPing):
-                if (!coord.pingStart() || !coord.pingFinish()):
+                if (not coord.pingBoth()):
                     goButton.configure(bg = "red")
                 else:
                     goButton.configure(bg = "green")
 
-                print (time.time())
             self.master.after(1000, self.ping)
 
     pingTimer = Pinger(root)

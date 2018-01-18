@@ -37,12 +37,16 @@ BAUD = 9600
 
 # 	ser.close()
 # 	return finishTime - startTime
+start_ready_message = 'a'
+start_line_crossed_message = 'b'
 start_ping_message = 'c'
+finish_ready_message = 'd'
+finish_line_crossed_message = 'e'
 finish_ping_message = 'f'
 
 def ping(message):
     timeOut = 0.2
-    ser = Serial(PORT, BAUD, timeout=1)
+    ser = Serial(PORT, BAUD)
     xbee = XBee(ser)
     startTime = time.time()
     xbee.tx(dest_addr='\x00\x01', data=message)
@@ -66,4 +70,28 @@ def pingFinish():
 def pingBoth():
     return pingStart() and pingFinish()
 
-print(pingBoth())
+def getTrial():
+    ser = Serial(PORT, BAUD, timeout=1)
+    xbee = XBee(ser)
+
+    # Send Ready messages
+    xbee.tx(dest_addr='\x00\x01', data=start_ready_message)
+    xbee.tx(dest_addr='\x00\x01', data=finish_ready_message)
+
+    # Wait for start line crossed
+    startMessage = xbee.wait_read_frame()["rf_data"].decode('utf8')
+    startTime = time.time()
+    while(startMessage != start_line_crossed_message):
+        startMessage = xbee.wait_read_frame()["rf_data"].decode('utf8')
+        startTime = time.time()
+
+    # Wait for finish line crossed
+    finishMessage = xbee.wait_read_frame()["rf_data"].decode('utf8')
+    finishTime = time.time()
+    while(finishMessage != finish_line_crossed_message):
+        finishMessage = xbee.wait_read_frame()["rf_data"].decode('utf8')
+        finishTime = time.time()
+
+    trialTime = finishTime - startTime
+
+    return trialTime

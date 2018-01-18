@@ -4,12 +4,13 @@ import time
 import tkinter.filedialog as tkFileDialog
 import csv
 from collections import defaultdict
+import datetime
+from datetime import datetime
 
 import coordinator as coord
 
 
 def openFile():
-
   fileName =  tkFileDialog.askopenfilename(initialdir = "/",title = "Select file",
     filetypes = (("csv files","*.csv"),("all files","*.*")))
   return fileName
@@ -89,30 +90,31 @@ if __name__ == '__main__':
 
     nameTimesDict["Kevin"].append(13.2)
     nameTimesDict["James"].append(14.1)
-    dictKeys = sorted(nameTimesDict.keys())
     entryGrid = [[0]*columns for row in range(rows)]
 
-    for i in range(0,rows):
-      if (i < len(dictKeys)):
-        currentName = dictKeys[i]
-        currentTimes = nameTimesDict[currentName]
-      else:
-        currentName = None
-        currentTimes = None
+    def drawGrid(dictKeys):
+        for i in range(0,rows):
+          if (i < len(dictKeys)):
+            currentName = dictKeys[i]
+            currentTimes = nameTimesDict[currentName]
+          else:
+            currentName = None
+            currentTimes = None
 
-      for j in range(0,columns):
-          entry = ttk.Entry(frame_buttons, text="", width=8)
-          entryGrid[i][j] = entry
-          if (j == 0 and currentName != None):
-              entry.configure(width=15)
-              entry.delete(0,tk.END)
-              entry.insert(0, currentName)
-          elif (currentTimes != None and j < len(currentTimes) + 1):
-              entry.configure(width=8)
-              entry.delete(0,tk.END)
-              entry.insert(0, currentTimes[j - 1])
-          entry.grid(row=i, column=j, sticky='news')
+          for j in range(0,columns):
+              entry = ttk.Entry(frame_buttons, text="", width=8)
+              entryGrid[i][j] = entry
+              if (j == 0 and currentName != None):
+                  entry.configure(width=15)
+                  entry.delete(0,tk.END)
+                  entry.insert(0, currentName)
+              elif (currentTimes != None and j < len(currentTimes) + 1):
+                  entry.configure(width=8)
+                  entry.delete(0,tk.END)
+                  entry.insert(0, str(currentTimes[j - 1]))
+              entry.grid(row=i, column=j, sticky='news')
 
+    drawGrid(sorted(nameTimesDict.keys()))
 
 #                            FILE MANAGEMENT
 #******************************************************************************
@@ -131,25 +133,61 @@ if __name__ == '__main__':
     browse = ttk.Button(fileLF, text=" Browse... ", command=browseFile)
     browse.grid(row=0, column=3, columnspan=2, sticky='W', padx=5, pady=2)
 
+    def saveFile():
+        fileName = str(datetime.now()).replace(":", ".")+".csv"
+
+        with open(fileName, 'w',newline='') as csvfile:
+            fileWriter = csv.writer(csvfile, delimiter=',')
+            names = sorted(nameTimesDict.keys())
+            for row in range(rows):
+                nameEntry = entryGrid[row][0]
+                name = nameEntry.get()
+                if(len(name) == 0):
+                    break
+                line = [name]
+                for cols in range(1, columns):
+                    timeEntry = entryGrid[row][cols]
+                    time = timeEntry.get()
+                    if (len(time) == 0):
+                        break
+                    line.append(time)
+                if (len(name) != 0):
+                    fileWriter.writerow(line)
+
+
+
+
 
     def inportFile():
       fileName = fileTextBox.get()
       if (fileName.endswith(".csv")):
-          with open(fileName) as csvfile:
+        with open(fileName) as csvfile:
             readCSV = csv.reader(csvfile, delimiter=',')
+            for row in readCSV:
+                for i in range(1, len(row)):
+                    word = row[i]
+                    if (len(word) == 0):
+                        break
+                    else:
+                        nameTimesDict[row[0]].append(word)
+            drawGrid(sorted(nameTimesDict.keys()))
+
+
+
 
 
     inport = ttk.Button(fileLF, text=" Import ", command= inportFile)
     inport.grid(row=1, column=0, columnspan=2, sticky='EW', padx=5, pady=2)
 
     def updateCell(name, value):
+      dictKeys = sorted(nameTimesDict.keys())
       nameTimesDict[name].append(value)
 
       row = dictKeys.index(name)
       col = len(nameTimesDict[name])
 
       entry = entryGrid[row][col]
-      entry.insert(0, value)
+      entry.insert(0, str(value))
 
     def test():
       updateCell("Kevin", 12.4)
@@ -167,6 +205,7 @@ if __name__ == '__main__':
             pass
 
     def popup_bonus(trialTime):
+      dictKeys = sorted(nameTimesDict.keys())
       win = tk.Toplevel()
       win.wm_title("Window")
       win.geometry('150x250')
@@ -223,7 +262,7 @@ if __name__ == '__main__':
     timer = tk.Label(timerLF, text= "00:00",font=("Helvetica", 16))
     timer.grid(sticky='EW', padx=5, pady=2)
 
-    export = ttk.Button(fileLF, text=" Export ", command=popup_bonus)
+    export = ttk.Button(fileLF, text=" Export ", command=saveFile)
     export.grid(row=2, column=0, columnspan=2, sticky='EW', padx=5, pady=2)
 
     class Pinger:

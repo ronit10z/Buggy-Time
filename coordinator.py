@@ -47,7 +47,6 @@ def getTrial():
 
     # Send Ready messages
     xbee.tx(dest_addr='\x00\x01', data=start_ready_message)
-    xbee.tx(dest_addr='\x00\x01', data=finish_ready_message)
 
     # Wait for start line crossed
     beginTime = time.time()
@@ -70,6 +69,7 @@ def getTrial():
         startTime = time.time()
         counter += 1
 
+    xbee.tx(dest_addr='\x00\x01', data=finish_ready_message)
     # Wait for finish line crossed
     beginTime = time.time()
     while not ser.inWaiting(): #check for no response and end if no response

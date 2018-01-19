@@ -105,8 +105,6 @@ if __name__ == '__main__':
     rows = 50
     columns = 10
 
-    nameTimesDict["Kevin"].append(13.2)
-    nameTimesDict["James"].append(14.1)
     entryGrid = [[0]*columns for row in range(rows)]
 
     def drawGrid(dictKeys):
@@ -151,7 +149,7 @@ if __name__ == '__main__':
     browse.grid(row=0, column=3, columnspan=2, sticky='W', padx=5, pady=2)
 
     def saveFile():
-        fileName = str(datetime.now()).replace(":", ".")+".csv"
+        fileName = str(datetime.now()).replace(":", ".")[0:22]+".csv"
 
         with open(fileName, 'w',newline='') as csvfile:
             fileWriter = csv.writer(csvfile, delimiter=',')
@@ -181,6 +179,7 @@ if __name__ == '__main__':
         with open(fileName) as csvfile:
             readCSV = csv.reader(csvfile, delimiter=',')
             for row in readCSV:
+                nameTimesDict[row[0]] = []
                 for i in range(1, len(row)):
                     word = row[i]
                     if (len(word) == 0):
@@ -217,6 +216,8 @@ if __name__ == '__main__':
             trialTime = coord.getTrial()
             if (trialTime == None):
                 return
+            trialTime = round(trialTime, 3)
+            timer.configure(text=str(trialTime))
             popup_bonus(trialTime)
         else:
             pass
@@ -245,6 +246,16 @@ if __name__ == '__main__':
       Can1.configure(yscrollcommand=vsbar.set)
 
       mylist = tk.Listbox(Can1, yscrollcommand = vsbar.set)
+      for i in range(rows):
+          entry = entryGrid[i][0]
+          name = entry.get()
+          if (len(name) == 0):
+              break
+          elif (name not in dictKeys):
+              nameTimesDict[name] = []
+
+      dictKeys = sorted(nameTimesDict.keys())
+
       for i in range(len(dictKeys)):
          mylist.insert(tk.END, dictKeys[i])
 

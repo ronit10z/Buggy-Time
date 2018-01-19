@@ -9,7 +9,7 @@
  **********************************************************************/
 
 // Digital pin definition for pressure sensor (debug purposes only)
-#define SENSOR_DIGITAL 8
+#define SENSOR_DIGITAL 9
 // Analog pin definition for pressure sensor
 #define SENSOR 0
 
@@ -18,7 +18,7 @@
 // LED Pin that shows the pad has been PRESSEDLED
 #define PRESSEDLED 12
 // LED Pin that shows pad is ready to recieve a press
-#define READYLED 11
+#define READYLED 10
 // Baseline voltage reading from pressure sensors on startup
 int baseline;
 

@@ -267,6 +267,7 @@ if __name__ == '__main__':
         nameidx = mylist.curselection()[0]
         name = mylist.get(nameidx)
         updateCell(name, trialTime)
+        drawGrid(sorted(nameTimesDict.keys()))
         canPing = True
         win.destroy()
 
